@@ -5,7 +5,6 @@ import { PortfolioDropzone } from "../components/partials/Dropzone";
 import { removeDuplicates } from "../components/utils/functions";
 import PortfolioServices from "../services/PortfolioServices";
 
-
 function UploadPortfolioForm() {
   const [portfolioPhotos, setPortfolioPhotos] = React.useState([]);
   const supportedExtentions = "image/jpg , image/jpeg , image/png";
@@ -30,21 +29,22 @@ function UploadPortfolioForm() {
     e.preventDefault();
     setHashtags(removeDuplicates(hashtags));
     setPortfolioPhotos(removeDuplicates(portfolioPhotos));
-  //   console.log(e);
+    //   console.log(e);
     await PortfolioServices.create({
-        title: formState.title,
-        description: formState.description,
-        hashtags: hashtags.map(h=>h.text)
+      title: formState.title,
+      description: formState.description,
+      hashtags: hashtags.map((h) => h.text),
     }).then(async (res) => {
-        console.log(res);
+      console.log(res);
 
-        await PortfolioServices.uploadPortfolioImages(res.data._id, portfolioPhotos)
-        setPortfolioPhotos([]);
-        setHashtags([]);
-        setFormState({title: "",
-        description: ""});
-    })
-
+      await PortfolioServices.uploadPortfolioImages(
+        res.data._id,
+        portfolioPhotos
+      );
+      setPortfolioPhotos([]);
+      setHashtags([]);
+      setFormState({ title: "", description: "" });
+    });
   };
 
   const handleDelete = (i) => {
@@ -84,7 +84,7 @@ function UploadPortfolioForm() {
 
   return (
     <div>
-      Upload YOUR Portfolio 
+      Upload YOUR Portfolio
       <form>
         <label htmlFor="title">
           Title
@@ -126,6 +126,5 @@ function UploadPortfolioForm() {
     </div>
   );
 }
-
 
 export default UploadPortfolioForm;

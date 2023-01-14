@@ -8,7 +8,6 @@ import Navbar from "./components/Navbar";
 import SignupForm from "./forms/SignupForm";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import Profile from "./components/Profile";
 import Portfolios from "./components/Portfolios";
 import UploadPortfolioForm from "./forms/UploadPortfolioForm";
 
