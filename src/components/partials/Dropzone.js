@@ -8,7 +8,7 @@ import React from "react";
 import { useDropzone } from "react-dropzone";
 
 
-const Dropzone = ({ onDrop, accept, imgsrc = "" }) => {
+export const MyDropzone = ({ onDrop, accept, imgsrc = "" }) => {
   // Initializing useDropzone hooks with options
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -39,7 +39,7 @@ const Dropzone = ({ onDrop, accept, imgsrc = "" }) => {
     <div className="dropzone" {...getRootProps()}>
       <input className="dropzone-input" {...getInputProps()} />
       <div className="text-center">
-        {isDragActive ? (
+        {!isDragActive ? (
           <h5 className="dropzone-content">Release to drop the files here</h5>
         ) : (
           aff(imgsrc)
@@ -93,4 +93,3 @@ export const PortfolioDropzone = ({ onDrop, accept, imgs }) => {
   );
 };
 
-export default Dropzone;

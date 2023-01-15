@@ -7,6 +7,9 @@ class PortfolioServices {
   getOne = async (id) => {
     return await AxiosClient.get(`/portfolio/${id}`);
   };
+  getByUserId = async (id) => {
+    return await AxiosClient.get(`/portfolio/user/${id}`);
+  }
   create = async ({title, description, hashtags}) => {
     const token = localStorage.getItem("auth-token");
     return await AxiosClient.post(`/portfolio/`, {title, description, hashtags},{
@@ -28,7 +31,6 @@ class PortfolioServices {
     const token = localStorage.getItem("auth-token");
     const form = new FormData();
    images.forEach((img)=> {
-    console.log(img)
     form.append("photos", img.file);
    })
 

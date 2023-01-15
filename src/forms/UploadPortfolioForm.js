@@ -6,7 +6,7 @@ import { PortfolioDropzone } from "../components/partials/Dropzone";
 import { removeDuplicates } from "../components/utils/functions";
 import PortfolioServices from "../services/PortfolioServices";
 
-function UploadPortfolioForm() {
+function UploadPortfolioForm({closeModal}) {
   const [portfolioPhotos, setPortfolioPhotos] = React.useState([]);
   const supportedExtentions = "image/jpg , image/jpeg , image/png";
 
@@ -36,7 +36,6 @@ function UploadPortfolioForm() {
       description: formState.description,
       hashtags: hashtags.map((h) => h.text),
     }).then(async (res) => {
-      console.log(res);
 
       await PortfolioServices.uploadPortfolioImages(
         res.data._id,
@@ -45,6 +44,7 @@ function UploadPortfolioForm() {
       setPortfolioPhotos([]);
       setHashtags([]);
       setFormState({ title: "", description: "" });
+      closeModal();
       toast.success(`Votre projet a été ajouter`, {
         position: "bottom-center",
         autoClose: 3500,

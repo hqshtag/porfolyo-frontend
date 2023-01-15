@@ -10,6 +10,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import Portfolios from "./components/Portfolios";
 import UploadPortfolioForm from "./forms/UploadPortfolioForm";
+import Profile from "./components/Profile";
+import styled from "styled-components";
 
 const customStyles = {
   content: {
@@ -32,7 +34,8 @@ function App() {
     "/profile"
   ];
   //relocate the user to landing page in any other case
-  if (!knownPaths.includes(window.location.pathname)) window.location.replace("/");
+  if (!knownPaths.includes(window.location.pathname) && !window.location.pathname.includes("/profile")
+  ) window.location.replace("/");
 
   const [modalIsOpen, setIsOpen] = React.useState(false);
 
@@ -40,12 +43,15 @@ function App() {
 
   const [authenticated, setAuthenticated] = useState(false);
 
+  const [editMode, setEditMode] = React.useState(false);
+
+
   useEffect(() => {
     (async () => {
       const response = await AuthServices.isAuthenticated();
       setAuthenticated(response.data === true);
     })();
-  }, [modalView]);
+  }, [modalView, modalIsOpen]);
 
   function openLoginPopup() {
     setModalView("LOGIN");
@@ -56,6 +62,20 @@ function App() {
     setModalView("SIGNUP");
     openModal();
   }
+
+  function openEditPopup() {
+    setEditMode(true);
+    setModalView("SIGNUP");
+    openModal();
+  }
+
+
+  function openNewPortfolioPopup() {
+    if(authenticated) setModalView("PORTFOLIO");
+    else setModalView("LOGIN");
+    openModal();
+  }
+
 
   function openModal() {
     setIsOpen(true);
@@ -77,7 +97,9 @@ function App() {
     window.location.reload(false);
   }
 
+  console.log(modalView);
   return (
+    
     <div className="App">
       <Navbar
         isAuth={authenticated}
@@ -93,21 +115,45 @@ function App() {
         contentLabel="AuthModal"
       >
         <h2 ref={(_subtitle) => (subtitle = _subtitle)}>
-          {modalView === "LOGIN" ? "Connection" : "Inscription"}
+        {modalView === "LOGIN" && "Connection"}
+        {modalView === "SIGNUP" && (editMode ? "Modifier vos cordonnées" : "Inscription")}
+        {modalView === "PORTFOLIO" && "Ajouter votre portfolio"}
         </h2>
         <button onClick={closeModal}>close</button>
-        {modalView === "LOGIN" ? <LoginForm closeModal={closeModal} /> : <SignupForm closeModal={closeModal} />}
+        {modalView === "LOGIN" && <LoginForm closeModal={closeModal} />}
+        {modalView === "SIGNUP" && <SignupForm closeModal={closeModal} editMode={editMode} setEditMode={setEditMode} />}
+        {modalView === "PORTFOLIO" && <UploadPortfolioForm closeModal={closeModal}/>}
       </Modal>
-      <Portfolios />
-      {authenticated && (<UploadPortfolioForm />)}
-      
-     {/*  <Routes>
-        <Route path="/" element={<Portfolios />} />
-        <Route path="/profile" element={ <Profile />}/>
-      </Routes> */}
+{/*       {authenticated && (<UploadPortfolioForm />)}
+ */}       <Routes>
+        <Route path="/" element={<Portfolios update={modalIsOpen} />} />
+        <Route path="/profile/:id" element={ <Profile openEditPopup={openEditPopup} update={modalIsOpen}  />}/>
+
+      </Routes>
+      <FloatingActionButton
+        onClick={openNewPortfolioPopup}
+      >
+        +
+      </FloatingActionButton>
       <ToastContainer />
     </div>
   );
 }
+
+const FloatingActionButton = styled.button`
+  position: fixed;
+  bottom: 70px;
+  right: 54px;
+
+  height: 58px;
+  width: 58px;
+
+  border-radius: 50%;
+  background-color: #1f4c;
+  color: white;
+  border: none;
+  font-weight: 900;
+  font-size: 38px;
+`
 
 export default App;

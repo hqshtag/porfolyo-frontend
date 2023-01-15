@@ -1,7 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 function Navbar({ isAuth, openSignup, openLogin, logout }) {
+  const navigate = useNavigate()
+
+  const goToCurrentUserProfile = () => {
+    const userid = localStorage.getItem('id#username').split('#')[0];
+    navigate(`/profile/${userid}`);
+  }
+
   return (
     <Nav>
       <div>
@@ -14,7 +22,8 @@ function Navbar({ isAuth, openSignup, openLogin, logout }) {
             <Button onClick={openLogin}>Connection</Button>
           </ButtonContainer>
         ) : (<ButtonContainer>
-            <Button onClick={logout}>logout</Button>
+            <Button onClick={goToCurrentUserProfile}>Profile</Button>
+            <Button onClick={logout}>Logout</Button>
         </ButtonContainer>)}
       </>
     </Nav>
