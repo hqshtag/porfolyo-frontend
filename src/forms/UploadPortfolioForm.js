@@ -1,11 +1,13 @@
 import React from "react";
 import { WithContext as ReactTags } from "react-tag-input";
 import { toast } from "react-toastify";
+import styled from "styled-components";
+import { Button, Container, Form, Label } from "../components/FormComponents";
 import { PortfolioDropzone } from "../components/partials/Dropzone";
 import { removeDuplicates } from "../components/utils/functions";
 import PortfolioServices from "../services/PortfolioServices";
 
-function UploadPortfolioForm({ editMode, selectedPortfolioId, closeModal }) {
+function UploadPortfolioForm({ editMode, selectedPortfolio, closeModal, setPortfolioEditMode }) {
   const [portfolioPhotos, setPortfolioPhotos] = React.useState([]);
   const supportedExtentions = "image/jpg , image/jpeg , image/png";
 
@@ -31,13 +33,14 @@ function UploadPortfolioForm({ editMode, selectedPortfolioId, closeModal }) {
     setPortfolioPhotos(removeDuplicates(portfolioPhotos));
     if (editMode) {
       await PortfolioServices.update({
-        _id: selectedPortfolioId,
+        _id: selectedPortfolio?._id,
         title: formState.title,
         description: formState.description,
         hashtags: hashtags.map((h) => h.text),
       }).then((res) => {
         setHashtags([]);
         setFormState({ title: "", description: "" });
+        setPortfolioEditMode(false);
         closeModal();
         toast.success(`Votre projet a été Modifier`, {
           position: "bottom-center",
@@ -112,29 +115,29 @@ function UploadPortfolioForm({ editMode, selectedPortfolioId, closeModal }) {
       return file;
     });
   };
-
+  console.log(editMode)
   return (
-    <div>
-      Upload YOUR Portfolio
-      <form>
-        <label htmlFor="title">
-          Title
+    <Container>
+      <Form>
+        <Label htmlFor="title">
+          Titre
           <input
             name="title"
             type="text"
             value={formState.title}
             onChange={handleFormChange}
           />
-        </label>
-        <label htmlFor="description">
+        </Label>
+        <Label htmlFor="description">
           Description
           <textarea
             name="description"
             type="text"
             value={formState.description}
             onChange={handleFormChange}
+            rows={4}
           />
-        </label>
+        </Label>
         <ReactTags
           tags={hashtags}
           /*suggestions={suggestions}*/
@@ -154,10 +157,12 @@ function UploadPortfolioForm({ editMode, selectedPortfolioId, closeModal }) {
           />
         )}
 
-        <button onClick={handleSubmit}>Save</button>
-      </form>
-    </div>
+        <Button onClick={handleSubmit}>Sauvgarde</Button>
+      </Form>
+    </Container>
   );
 }
+
+
 
 export default UploadPortfolioForm;

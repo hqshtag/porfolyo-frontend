@@ -6,16 +6,16 @@ import UserServices from "../services/UserServices";
 import Portfolio from "./partials/Portfolio";
 import { PortfoliosDisplay } from "./Portfolios";
 
-const Profile = ({openEditPopup, update}) => {
+const Profile = ({ openEditPopup, openPortfolioEdit,selectPortfolio, update, search }) => {
   const navigate = useNavigate();
   const { id } = useParams();
 
   const [userProfile, setUserProfile] = React.useState({});
   const [userPortfolios, setUserPortfolios] = React.useState([]);
 
-  const [userAvatar, setUserAvatar] = React.useState(null)
+  const [userAvatarSrc, setUserAvatarSrc] = React.useState("");
 
-  const canEdit = localStorage.getItem('id#username')?.split("#")[0] === id;
+  const canEdit = localStorage.getItem("id#username")?.split("#")[0] === id;
 
   React.useEffect(() => {
     (async () => {
@@ -28,45 +28,54 @@ const Profile = ({openEditPopup, update}) => {
       }
     })();
   }, [id, navigate, update]);
-  
-  React.useEffect(()=>{
-    console.log(userProfile)
-    if(userProfile?.avatar !== userAvatar){
-      setUserAvatar(<Avatar
-        src={`http://localhost:3100/users/${userProfile._id}/avatar`}
-        alt=""
-      />)
-    }else setUserAvatar(<Avatar
-      src={`https://ui-avatars.com/api/?name=${userProfile.username}`}
-      alt=""
-    />)
-  }, [userProfile, update])
-  
-  const portfoliosRender = Array.isArray(userPortfolios)
-    ? userPortfolios.map((p, k) => (
-        <Portfolio portfolio={p} key={k} showAuthor={false} />
+
+  React.useEffect(() => {
+    if (userProfile?.avatar) {
+      setUserAvatarSrc(`http://localhost:3100/users/${userProfile._id}/avatar`);
+    } else
+      setUserAvatarSrc(
+        `https://ui-avatars.com/api/?name=${userProfile.username}`
+      );
+  }, [userProfile, update, userProfile?.avatar]);
+
+  const forwardedSelectPortfolio = (portfolio) => {
+    if (canEdit) {
+      selectPortfolio(portfolio);
+      openPortfolioEdit(true);
+    } else {
+      console.log(portfolio);
+    }
+  };
+
+  const portfoliosRender = Array.isArray(userPortfolios) && userPortfolios.length > 0
+    ? userPortfolios.filter((p) => {
+      return (
+        p.title.toLowerCase().includes(search.toLowerCase()) ||
+        p.description.toLowerCase().includes(search.toLowerCase()) ||
+        p.hashtags?.find((hashtag) => hashtag.label === search.toLowerCase())
+      );
+    }).map((p, k) => (
+        <Portfolio
+          portfolio={p}
+          key={k}
+          showAuthor={false}
+          select={(p) => forwardedSelectPortfolio(p)}
+        />
       ))
     : [];
-
-
 
   return (
     <div>
       <GoBack onClick={() => navigate("/")}>❮❮</GoBack>
+      {canEdit && <EditButton onClick={openEditPopup}>✒️ Edit</EditButton>}
       <Container>
+        <Avatar src={userAvatarSrc} alt="" key={Date.now()} />
 
-        {userAvatar}
-       
         <div>
           <h3>{userProfile.username}</h3>
           <h4>{userProfile.email}</h4>
         </div>
       </Container>
-      {
-        canEdit && (
-          <button onClick={openEditPopup}>✒️ Edit</button>
-        )
-      }
       <PortfoliosDisplay>
         {portfoliosRender.length
           ? portfoliosRender
@@ -94,11 +103,25 @@ const GoBack = styled.span`
   padding-right: 2px;
 `;
 
+const EditButton = styled.button`
+position: absolute;
+right: 100px;
+margin: 4px;
+width: 80px;
+height: 30px;
+border-radius: 18px;
+color: #111111;
+background-color: #ffffff;
+line-height: 2px;
+`
+
 const Container = styled.div`
   margin: 36px;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #DEF;
+  padding: 8px 14px;
   > div {
     display: flex;
     flex-direction: column;
@@ -111,7 +134,7 @@ const Container = styled.div`
     padding: 0;
     margin: 0;
     margin-left: 24px;
-    color: #141566;
+    color: #1c1c1c;
   }
 `;
 
@@ -119,12 +142,14 @@ export const Avatar = styled.img`
   height: 58px;
   width: 58px;
   border-radius: 50%;
+  object-fit: cover;
 `;
 export const SmallAvatar = styled.img`
   height: 37px;
   width: 37px;
   border-radius: 50%;
-  margin: 8px;
+  margin: 2px;
+  object-fit: cover;
 `;
 
 export default Profile;

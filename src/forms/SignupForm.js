@@ -1,5 +1,6 @@
 import React from "react";
 import { toast } from "react-toastify";
+import { Button, Container, Form, Label } from "../components/FormComponents";
 import { MyDropzone } from "../components/partials/Dropzone";
 import AuthServices from "../services/AuthServices";
 import UserServices from "../services/UserServices";
@@ -112,21 +113,22 @@ function SignupForm({ editMode, setEditMode ,closeModal }) {
   };
 
   return (
-    <div>
-      <form>
+    <Container>
+      <Form>
         {
           editMode &&  (
-            <label htmlFor="Avatar">
+            <Label htmlFor="Avatar">
             <MyDropzone
               onDrop={handleOnDrop}
               accept={supportedExtentions}
               multiple={false}
               maxSize={20}
             />
-          </label>
+          </Label>
           )
         }
-        <label htmlFor="email">
+        {!editMode &&    
+        <Label htmlFor="email">
           Email
           <input
             name="email"
@@ -134,8 +136,8 @@ function SignupForm({ editMode, setEditMode ,closeModal }) {
             value={formState.email}
             onChange={handleChange}
           />
-        </label>
-        <label htmlFor="username">
+        </Label>}
+        <Label htmlFor="username">
           Username
           <input
             name="username"
@@ -143,8 +145,8 @@ function SignupForm({ editMode, setEditMode ,closeModal }) {
             value={formState.username}
             onChange={handleChange}
           />
-        </label>
-        <label htmlFor="password">
+        </Label>
+        <Label htmlFor="password">
           Password
           <input
             name="password"
@@ -152,10 +154,10 @@ function SignupForm({ editMode, setEditMode ,closeModal }) {
             value={formState.password}
             onChange={handleChange}
           />
-        </label>
-        <button onClick={handleRegister}>{editMode ? "Update" : "Login"}</button>
-      </form>
-    </div>
+        </Label>
+        <Button onClick={handleRegister}>{editMode ? "Update" : "Signup"}</Button>
+      </Form>
+    </Container>
   );
 }
 

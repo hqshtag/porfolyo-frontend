@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import AuthServices from "./services/AuthServices";
 import LoginForm from "./forms/LoginForm";
@@ -28,14 +28,14 @@ Modal.setAppElement("#root");
 
 function App() {
   let subtitle;
-  
-  const knownPaths = [
-    "/",
-    "/profile"
-  ];
+
+  const knownPaths = ["/", "/profile"];
   //relocate the user to landing page in any other case
-  if (!knownPaths.includes(window.location.pathname) && !window.location.pathname.includes("/profile")
-  ) window.location.replace("/");
+  if (
+    !knownPaths.includes(window.location.pathname) &&
+    !window.location.pathname.includes("/profile")
+  )
+    window.location.replace("/");
 
   const [modalIsOpen, setIsOpen] = React.useState(false);
 
@@ -44,7 +44,10 @@ function App() {
   const [authenticated, setAuthenticated] = useState(false);
 
   const [editMode, setEditMode] = React.useState(false);
+  const [portfolioEditMode, setPortfolioEditMode] = React.useState(false);
+  const [selectedPortfolio, setSelectedPortfolio] = React.useState(null);
 
+  const [search, setSearch] = React.useState('');
 
   useEffect(() => {
     (async () => {
@@ -69,13 +72,12 @@ function App() {
     openModal();
   }
 
-
-  function openNewPortfolioPopup() {
-    if(authenticated) setModalView("PORTFOLIO");
+  function openNewPortfolioPopup(editMode = false) {
+    if (authenticated) setModalView("PORTFOLIO");
     else setModalView("LOGIN");
+    setPortfolioEditMode(editMode);
     openModal();
   }
-
 
   function openModal() {
     setIsOpen(true);
@@ -99,13 +101,14 @@ function App() {
 
   console.log(modalView);
   return (
-    
     <div className="App">
       <Navbar
         isAuth={authenticated}
         openLogin={openLoginPopup}
         logout={logout}
         openSignup={openSingupPopup}
+        keyword={search}
+        setKeyword={setSearch}
       />
       <Modal
         isOpen={modalIsOpen}
@@ -113,26 +116,53 @@ function App() {
         onRequestClose={closeModal}
         style={customStyles}
         contentLabel="AuthModal"
+        overlayClassName="modal-overlay"
       >
-        <h2 ref={(_subtitle) => (subtitle = _subtitle)}>
-        {modalView === "LOGIN" && "Connection"}
-        {modalView === "SIGNUP" && (editMode ? "Modifier vos cordonnées" : "Inscription")}
-        {modalView === "PORTFOLIO" && "Ajouter votre portfolio"}
-        </h2>
-        <button onClick={closeModal}>close</button>
+        <ModalSubTitle ref={(_subtitle) => (subtitle = _subtitle)}>
+          {modalView === "LOGIN" && "Connection"}
+          {modalView === "SIGNUP" &&
+            (editMode ? "Modifier vos cordonnées" : "Inscription")}
+          {modalView === "PORTFOLIO" &&
+            (portfolioEditMode
+              ? "Modifier votre portfolio"
+              : "Ajouter votre portfolio")}
+        </ModalSubTitle>
+        <CloseModalBtn onClick={closeModal}>🗙</CloseModalBtn>
         {modalView === "LOGIN" && <LoginForm closeModal={closeModal} />}
-        {modalView === "SIGNUP" && <SignupForm closeModal={closeModal} editMode={editMode} setEditMode={setEditMode} />}
-        {modalView === "PORTFOLIO" && <UploadPortfolioForm closeModal={closeModal}/>}
+        {modalView === "SIGNUP" && (
+          <SignupForm
+            closeModal={closeModal}
+            editMode={editMode}
+            setEditMode={setEditMode}
+          />
+        )}
+        {modalView === "PORTFOLIO" && (
+          <UploadPortfolioForm
+            editMode={portfolioEditMode}
+            closeModal={closeModal}
+            selectedPortfolio={selectedPortfolio}
+            setPortfolioEditMode={setPortfolioEditMode}
+          />
+        )}
       </Modal>
-{/*       {authenticated && (<UploadPortfolioForm />)}
- */}       <Routes>
-        <Route path="/" element={<Portfolios update={modalIsOpen} />} />
-        <Route path="/profile/:id" element={ <Profile openEditPopup={openEditPopup} update={modalIsOpen}  />}/>
-
+      {/*       {authenticated && (<UploadPortfolioForm />)}
+       */}{" "}
+      <Routes>
+        <Route path="/" element={<Portfolios update={modalIsOpen} search={search} />} />
+        <Route
+          path="/profile/:id"
+          element={
+            <Profile
+              openEditPopup={openEditPopup}
+              openPortfolioEdit={openNewPortfolioPopup}
+              selectPortfolio={setSelectedPortfolio}
+              update={modalIsOpen}
+              search={search}
+            />
+          }
+        />
       </Routes>
-      <FloatingActionButton
-        onClick={openNewPortfolioPopup}
-      >
+      <FloatingActionButton onClick={(e) => openNewPortfolioPopup()}>
         +
       </FloatingActionButton>
       <ToastContainer />
@@ -140,6 +170,26 @@ function App() {
   );
 }
 
+const ModalSubTitle = styled.h2`
+  text-align: center;
+`;
+
+const CloseModalBtn = styled.button`
+  position: absolute;
+  border-radius: 50%;
+  height: 25px;
+  width: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 20px;
+  right: 20px;
+  background-color: #f85144;
+  color: white;
+  border: none;
+  font-size: 16px;
+  line-height: 4px;
+`;
 const FloatingActionButton = styled.button`
   position: fixed;
   bottom: 70px;
@@ -154,6 +204,6 @@ const FloatingActionButton = styled.button`
   border: none;
   font-weight: 900;
   font-size: 38px;
-`
+`;
 
 export default App;

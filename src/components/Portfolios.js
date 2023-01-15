@@ -4,7 +4,7 @@ import PortfolioServices from "../services/PortfolioServices";
 import Portfolio from "./partials/Portfolio";
 
 /**FETCH AND DISPLAY PORTFOLIOS */
-const Portfolios = ({update}) => {
+const Portfolios = ({ update, search }) => {
   const [portfolios, setPortfolios] = React.useState([]);
 
   useEffect(() => {
@@ -14,7 +14,17 @@ const Portfolios = ({update}) => {
     })();
   }, [update]);
 
-  const portfoliosRender = portfolios?.map((p, k) => <Portfolio portfolio={p} key={k} />);
+  const portfoliosRender = portfolios
+    ?.filter((p) => {
+      return (
+        p.title.toLowerCase().includes(search.toLowerCase()) ||
+        p.description.toLowerCase().includes(search.toLowerCase()) ||
+        p.hashtags?.find((hashtag) => hashtag.label === search.toLowerCase())
+      );
+    })
+    .map((p, k) => (
+      <Portfolio portfolio={p} key={k} select={(p) => console.log(p)} />
+    ));
 
   return (
     <div>
@@ -23,12 +33,11 @@ const Portfolios = ({update}) => {
   );
 };
 
-
 export const PortfoliosDisplay = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
   flex-wrap: wrap;
-`
+`;
 
 export default Portfolios;

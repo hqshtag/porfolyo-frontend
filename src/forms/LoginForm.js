@@ -1,6 +1,7 @@
 import React from "react";
 import { toast } from "react-toastify";
 import AuthServices from "../services/AuthServices";
+import { Button, Container, Form, Label } from "../components/FormComponents";
 
 function LoginForm({closeModal}) {
   const [formState, setFormState] = React.useState({
@@ -60,9 +61,9 @@ function LoginForm({closeModal}) {
   };
 
   return (
-    <div>
-      <form>
-        <label htmlFor="email">
+    <Container>
+      <Form>
+        <Label htmlFor="email">
           Email
           <input
             name="email"
@@ -70,8 +71,8 @@ function LoginForm({closeModal}) {
             value={formState.email}
             onChange={handleChange}
           />
-        </label>
-        <label htmlFor="password">
+        </Label>
+        <Label htmlFor="password">
           Password
           <input
             name="password"
@@ -79,10 +80,10 @@ function LoginForm({closeModal}) {
             value={formState.password}
             onChange={handleChange}
           />
-        </label>
-        <button onClick={handleLogin}>Login</button>
-      </form>
-    </div>
+        </Label>
+        <Button onClick={handleLogin}>Login</Button>
+      </Form>
+    </Container>
   );
 }
 
