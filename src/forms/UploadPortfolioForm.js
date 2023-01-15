@@ -1,12 +1,11 @@
 import React from "react";
 import { WithContext as ReactTags } from "react-tag-input";
 import { toast } from "react-toastify";
-import styled from "styled-components";
 import { PortfolioDropzone } from "../components/partials/Dropzone";
 import { removeDuplicates } from "../components/utils/functions";
 import PortfolioServices from "../services/PortfolioServices";
 
-function UploadPortfolioForm({closeModal}) {
+function UploadPortfolioForm({ editMode, selectedPortfolioId, closeModal }) {
   const [portfolioPhotos, setPortfolioPhotos] = React.useState([]);
   const supportedExtentions = "image/jpg , image/jpeg , image/png";
 
@@ -30,32 +29,53 @@ function UploadPortfolioForm({closeModal}) {
     e.preventDefault();
     setHashtags(removeDuplicates(hashtags));
     setPortfolioPhotos(removeDuplicates(portfolioPhotos));
-    //   console.log(e);
-    await PortfolioServices.create({
-      title: formState.title,
-      description: formState.description,
-      hashtags: hashtags.map((h) => h.text),
-    }).then(async (res) => {
-
-      await PortfolioServices.uploadPortfolioImages(
-        res.data._id,
-        portfolioPhotos
-      );
-      setPortfolioPhotos([]);
-      setHashtags([]);
-      setFormState({ title: "", description: "" });
-      closeModal();
-      toast.success(`Votre projet a été ajouter`, {
-        position: "bottom-center",
-        autoClose: 3500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+    if (editMode) {
+      await PortfolioServices.update({
+        _id: selectedPortfolioId,
+        title: formState.title,
+        description: formState.description,
+        hashtags: hashtags.map((h) => h.text),
+      }).then((res) => {
+        setHashtags([]);
+        setFormState({ title: "", description: "" });
+        closeModal();
+        toast.success(`Votre projet a été Modifier`, {
+          position: "bottom-center",
+          autoClose: 3500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       });
-    });
+    } else {
+      await PortfolioServices.create({
+        title: formState.title,
+        description: formState.description,
+        hashtags: hashtags.map((h) => h.text),
+      }).then(async (res) => {
+        await PortfolioServices.uploadPortfolioImages(
+          res.data._id,
+          portfolioPhotos
+        );
+        setPortfolioPhotos([]);
+        setHashtags([]);
+        setFormState({ title: "", description: "" });
+        closeModal();
+        toast.success(`Votre projet a été ajouter`, {
+          position: "bottom-center",
+          autoClose: 3500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      });
+    }
   };
 
   const handleDelete = (i) => {
@@ -125,12 +145,14 @@ function UploadPortfolioForm({closeModal}) {
           inputFieldPosition="bottom"
           autocomplete
         />
-        <PortfolioDropzone
-          onDrop={handleOnDrop}
-          accept={supportedExtentions}
-          multiple={true}
-          maxSize={20}
-        />
+        {!editMode && (
+          <PortfolioDropzone
+            onDrop={handleOnDrop}
+            accept={supportedExtentions}
+            multiple={true}
+            maxSize={20}
+          />
+        )}
 
         <button onClick={handleSubmit}>Save</button>
       </form>

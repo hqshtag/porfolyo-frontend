@@ -32,7 +32,9 @@ class UserServices {
 
     updateUserDetails = async ({username, email, password, _id}) => {
         const token = localStorage.getItem("auth-token");
-
+        email = email!=="" ? email.trim() : undefined;
+        username = username!=="" ? username.trim() : undefined;
+        password = password!=="" ? password.trim() : undefined;
         return await AxiosClient.patch(`/users/${_id}`,  {username, email, password },{
             headers: {
                 "auth-token": `${token}`

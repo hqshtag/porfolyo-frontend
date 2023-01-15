@@ -20,6 +20,9 @@ class PortfolioServices {
   }
   update = async ({_id, title, description, hashtags}) => {
     const token = localStorage.getItem("auth-token");
+    title = title!=="" ? title.trim() : undefined;
+    description = description!=="" ? description.trim() : undefined;
+    hashtags = Array.isArray(hashtags) && hashtags.length > 0 ? hashtags : undefined;
     return await AxiosClient.patch(`/portfolio/${_id}`, {title, description, hashtags}, {
         headers: {
             "auth-token": `${token}`,
