@@ -1,5 +1,6 @@
 import React from "react";
 import { WithContext as ReactTags } from "react-tag-input";
+import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PortfolioDropzone } from "../components/partials/Dropzone";
 import { removeDuplicates } from "../components/utils/functions";
@@ -44,6 +45,16 @@ function UploadPortfolioForm() {
       setPortfolioPhotos([]);
       setHashtags([]);
       setFormState({ title: "", description: "" });
+      toast.success(`Votre projet a été ajouter`, {
+        position: "bottom-center",
+        autoClose: 3500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     });
   };
 

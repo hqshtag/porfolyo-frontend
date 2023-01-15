@@ -5,7 +5,7 @@ function Navbar({ isAuth, openSignup, openLogin, logout }) {
   return (
     <Nav>
       <div>
-        <Title>Porfolyo</Title>
+        <Title>Porfolio</Title>
       </div>
       <>
         {!isAuth ? (
